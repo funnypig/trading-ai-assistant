@@ -1,0 +1,15 @@
+[
+	{
+		"file_name": "spy_quarter_expir_19_12_2025_option_chain.csv",
+		"ticker": "SPY",
+		"note": "17-18.12.2025 SPY range is 670-675 (no vix issues), while quarter expiration max pain is at 680",
+		"decision": "enter with low risk"
+	},
+	{
+		"file_name": "finviz_intc_12_22_2025_before_market_option_chain.csv",
+		"chart": "INTCd025605901i.png",
+		"ticker": "INTC",
+		"note": "Low channel resistance. Good fundamental. Strong Sell PUT signal. 3.8% in a month, +1.7% in 2 weeks. Risk is weak volume support under 36 strike, AI sentiment change, demand.",
+		"decision": "enter"
+	}
+]

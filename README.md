@@ -2,7 +2,13 @@
 Trading AIssistant 
 
 
-### Resources
+### Getting started
+
+```python
+uv run --env-file .env python3
+```
+
+### Third-party Resources
 
 - https://www.gurufocus.com - fundamental stock data
 - https://finviz.com - screener, charts, fundamental

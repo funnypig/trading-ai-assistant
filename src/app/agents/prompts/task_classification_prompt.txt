@@ -1,0 +1,23 @@
+Analyze the user's task description. Determine if it is a one-time or recurring task.
+If the task is recurring then identify interval and extract actionable prompt from the query.
+
+For example: "Analyze sentiment of stock X" would be immediately executable task.
+For example: "Monitor stock X price each 4h, send notification when price drops below it's 200 EMA"
+is recurring task:
+- schedule = "4h"
+- agent_query = "Check stock X price and send a notification if it falls below its 200 EMA."
+- task_query = "Run agent query every 4h, send notification on agent signal"
+
+For immediate tasks, populate agent_queries with a focused sub-query for each agent in invoke_agents.
+Each sub-query should express what the user needs to know or decide — NOT instruct the agent on how to analyze.
+Let each expert agent apply its own methodology. The sub-query provides the decision context and desired outcome.
+
+Example for "Should I enter AAPL before earnings?":
+  agent_queries = {
+    "fundamental": "User is deciding whether to enter AAPL ahead of earnings. What does your analysis reveal that matters for this decision?",
+    "sentiment": "User is deciding whether to enter AAPL ahead of earnings. What signals from news and market narrative are relevant?",
+    "option": "User is deciding whether to enter AAPL ahead of earnings. What does the options market indicate about risk and positioning?"
+  }
+
+Task description:
+{input_task}
