@@ -8,6 +8,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from src.app.data.finviz.utils import get_headers
+from src.app.infrastructure.cache.decorator import redis_cache
 
 INCOME_STATEMENT_URL = "https://elite.finviz.com/api/statement.ashx?t={ticker}&so=R&s=IQ"
 BALANCE_SHEET_URL = "https://elite.finviz.com/api/statement.ashx?t={ticker}&so=R&s=BQ"
@@ -51,8 +52,26 @@ class StockDescriptiveInfo:
         return self.to_markdown()
 
 
+def _descriptive_dumps(info: StockDescriptiveInfo) -> str:
+    return json.dumps({
+        "description": info.description,
+        "financials": info.financials,
+        "institutional_ownership": info.institutional_ownership,
+    })
+
+
+def _descriptive_loads(s: str) -> StockDescriptiveInfo:
+    data = json.loads(s)
+    return StockDescriptiveInfo(
+        description=data["description"],
+        financials=[tuple(pair) for pair in data["financials"]],
+        institutional_ownership=[tuple(pair) for pair in data["institutional_ownership"]],
+    )
+
+
 # API related functions
 
+@redis_cache(ttl=86400, dumps=json.dumps, loads=json.loads)
 def get_income_statement(ticker: str) -> dict:
     url = INCOME_STATEMENT_URL.format(ticker=ticker)
     response = requests.get(url, headers=get_headers())
@@ -61,6 +80,7 @@ def get_income_statement(ticker: str) -> dict:
     return data
 
 
+@redis_cache(ttl=86400, dumps=json.dumps, loads=json.loads)
 def get_balance_sheet(ticker: str) -> dict:
     url = BALANCE_SHEET_URL.format(ticker=ticker)
     response = requests.get(url, headers=get_headers())
@@ -69,6 +89,7 @@ def get_balance_sheet(ticker: str) -> dict:
     return data
 
 
+@redis_cache(ttl=86400, dumps=json.dumps, loads=json.loads)
 def get_cash_flow(ticker: str) -> dict:
     url = CASH_FLOW_URL.format(ticker=ticker)
     response = requests.get(url, headers=get_headers())
@@ -108,6 +129,7 @@ def get_fundamental_info(ticker: str) -> str:
     return info
 
 
+@redis_cache(ttl=3600, dumps=_descriptive_dumps, loads=_descriptive_loads)
 def get_stock_descriptive(ticker: str) -> StockDescriptiveInfo:
     url = STOCK_DESCRIPTIVE_URL.format(ticker=ticker)
     response = requests.get(url, headers=get_headers())

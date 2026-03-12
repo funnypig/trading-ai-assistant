@@ -21,6 +21,8 @@ def _estimate_underlying_price(chain: pd.DataFrame) -> Optional[float]:
     """Estimate spot using the strike with |delta| closest to 0.5 (ATM proxy)."""
     if chain is None or chain.empty:
         return None
+    if FK.DELTA not in chain.columns or FK.STRIKE not in chain.columns:
+        return None
 
     strikes = pd.to_numeric(chain[FK.STRIKE], errors="coerce")
     delta = pd.to_numeric(chain[FK.DELTA], errors="coerce").abs()
@@ -51,6 +53,8 @@ def _filter_chain_for_gamma(
     """Drop deep ITM/OTM and negligible OI rows to stabilize gamma metrics."""
     if chain is None or chain.empty:
         return chain
+    if FK.DELTA not in chain.columns:
+        return chain.iloc[0:0]  # empty DataFrame with same columns
 
     abs_delta = pd.to_numeric(chain[FK.DELTA], errors="coerce").abs()
     delta_mask = (abs_delta >= min_abs_delta) & (abs_delta <= max_abs_delta)

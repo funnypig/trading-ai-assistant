@@ -2,6 +2,9 @@ import operator
 from pydantic import BaseModel
 from typing import Annotated, List, Literal, TypedDict
 
+from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
+
 
 class TaskClassificationResult(BaseModel):
     """
@@ -18,7 +21,7 @@ class TaskClassificationResult(BaseModel):
     task_query: str | None
     agent_query: str
     agent_queries: dict[str, str] = {}
-    invoke_agents: List[Literal["option", "fundamental", "sentiment", "technical"]]
+    invoke_agents: List[Literal["option", "fundamental", "sentiment"]]
     ticker: str | None
 
 
@@ -33,8 +36,17 @@ class AgentOutput(TypedDict):
     result: str
 
 
+def _results_reducer(existing: list, new: list) -> list:
+    """Empty list = reset (new turn). Non-empty list = append (parallel fan-out within a turn)."""
+    if not new:
+        return []
+    return existing + new
+
+
 class AgentState(TypedDict):
+    messages: Annotated[list[BaseMessage], add_messages]  # Conversation history, persisted by checkpointer
+    previous_context: str  # Accumulated synthesis text from prior analysis runs
     query: str
     task_classification: TaskClassificationResult
-    results: Annotated[list[AgentOutput], operator.add] = []  # Reducer collects parallel results
+    results: Annotated[list[AgentOutput], _results_reducer]  # Resets on [] input, appends otherwise
     final_answer: str

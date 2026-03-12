@@ -10,7 +10,8 @@ class SentimentAnalysisNode:
 
     def __call__(self, state: AgentState):
         init_registry()
-        query = state.task_classification.agent_queries.get("sentiment") or state.task_classification.agent_query
+        tc = state["task_classification"]
+        query = tc.agent_queries.get("sentiment") or tc.agent_query
         result = self.agent.invoke({
             "messages": [{"role": "user", "content": query}]
         })

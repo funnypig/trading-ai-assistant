@@ -4,8 +4,11 @@ import pandas as pd
 from io import BytesIO
 
 from src.app.data.finviz.utils import with_api_token
+from src.app.infrastructure.cache.decorator import redis_cache
+from src.app.infrastructure.cache.serializers import df_dumps, df_loads
 
 
+@redis_cache(ttl=900, dumps=df_dumps, loads=df_loads)
 def get_screener_by_url(url: str) -> pd.DataFrame:
     url = with_api_token(url)
 

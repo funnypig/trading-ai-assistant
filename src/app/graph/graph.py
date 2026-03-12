@@ -18,10 +18,12 @@ def _route_task(state: AgentState) -> list[str]:
     tc = state["task_classification"]
     if tc.task_type == "recurring":
         return ["recurring_task"]
+    if not tc.invoke_agents:
+        return ["synthesize"]  # Answer from previous_context, no new data needed
     return list(tc.invoke_agents)
 
 
-def build_graph() -> CompiledStateGraph:
+def build_graph(checkpointer=None) -> CompiledStateGraph:
     llm_mini = init_chat_model(MINI_MODEL)
     llm_smart = init_chat_model(SMART_MODEL)
 
@@ -41,6 +43,7 @@ def build_graph() -> CompiledStateGraph:
         _route_task,
         {
             "recurring_task": "recurring_task",
+            "synthesize": "synthesize",
             "fundamental": "fundamental",
             "sentiment": "sentiment",
             "option": "option",
@@ -53,4 +56,4 @@ def build_graph() -> CompiledStateGraph:
     graph.add_edge("recurring_task", END)
     graph.add_edge("synthesize", END)
 
-    return graph.compile()
+    return graph.compile(checkpointer=checkpointer)

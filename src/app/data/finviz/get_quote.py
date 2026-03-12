@@ -5,6 +5,8 @@ from io import BytesIO
 from enum import Enum
 
 from src.app.data.finviz.utils import with_api_token
+from src.app.infrastructure.cache.decorator import redis_cache
+from src.app.infrastructure.cache.serializers import df_dumps, df_loads
 
 GET_QUOTE_URL = "https://elite.finviz.com/quote_export.ashx?t={ticker}&p={p}&r={r}"
 
@@ -17,6 +19,7 @@ class FinvizQuoteParameters(Enum):
     min_5 = dict(p="i5", r="d5")
 
 
+@redis_cache(ttl=900, dumps=df_dumps, loads=df_loads)
 def get_stock_quote(ticker: str, period: FinvizQuoteParameters = FinvizQuoteParameters.daily) -> pd.DataFrame:
     url = GET_QUOTE_URL.format(ticker=ticker, **period.value)
     url = with_api_token(url)

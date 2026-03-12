@@ -13,11 +13,39 @@ Each sub-query should express what the user needs to know or decide — NOT inst
 Let each expert agent apply its own methodology. The sub-query provides the decision context and desired outcome.
 
 Example for "Should I enter AAPL before earnings?":
-  agent_queries = {
+  agent_queries = {{
     "fundamental": "User is deciding whether to enter AAPL ahead of earnings. What does your analysis reveal that matters for this decision?",
     "sentiment": "User is deciding whether to enter AAPL ahead of earnings. What signals from news and market narrative are relevant?",
     "option": "User is deciding whether to enter AAPL ahead of earnings. What does the options market indicate about risk and positioning?"
-  }
+  }}
+
+CONVERSATION CONTEXT:
+
+You have access to the recent conversation history and a summary of any analysis already performed.
+Use these to make better routing decisions.
+
+Previous conversation:
+{conversation_history}
+
+Previously performed analysis (available_context):
+{available_context}
+
+ROUTING RULES USING CONTEXT:
+
+1. invoke_agents = [] is valid — use it when available_context already covers what the user is asking.
+   Example: user asks "what was the max pain?" and available_context contains option analysis → invoke_agents = []
+
+2. When available_context is partial, invoke only the missing agents.
+   Example: available_context has option analysis for TSLA, user asks about earnings → invoke_agents = ["fundamental"]
+
+3. When the user asks about a new ticker not covered in available_context, invoke all relevant agents for that ticker.
+   Example: available_context has TSLA analysis, user asks "compare to NVDA" → invoke_agents = ["option", "fundamental"] for NVDA
+
+4. Use conversation_history to resolve ambiguous references.
+   Example: user says "what about that stock" → infer ticker from the most recent stock discussed in conversation_history.
+
+5. For follow-up questions that only need the existing analysis to answer (elaboration, clarification, position recap),
+   set invoke_agents = [] and let the synthesizer answer from context.
 
 Task description:
 {input_task}

@@ -8,7 +8,8 @@ class FundamentalAnalysisNode:
         self.name = "Fundamental Analysis"
 
     def __call__(self, state: AgentState):
-        query = state.task_classification.agent_queries.get("fundamental") or state.task_classification.agent_query
+        tc = state["task_classification"]
+        query = tc.agent_queries.get("fundamental") or tc.agent_query
         result = self.agent.invoke({
             "messages": [{"role": "user", "content": query}]
         })

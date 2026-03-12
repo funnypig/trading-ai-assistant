@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     playwright_user_data_dir: str
     openai_api_key: str
     anthropic_api_key: str
+    redis_url: str = "redis://localhost:6379/0"
 
     class Config:
         env_file = ".env"

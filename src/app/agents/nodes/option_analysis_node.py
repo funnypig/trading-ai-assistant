@@ -9,7 +9,8 @@ class OptionAnalysisNode:
 
     def __call__(self, state: AgentState):
         # TODO: save observations to analyze dynamic in future
-        query = state.task_classification.agent_queries.get("option") or state.task_classification.agent_query
+        tc = state["task_classification"]
+        query = tc.agent_queries.get("option") or tc.agent_query
         result = self.agent.invoke({
             "messages": [{"role": "user", "content": query}]
         })

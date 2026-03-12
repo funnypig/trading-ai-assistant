@@ -1,4 +1,5 @@
 from importlib.resources import files
+from langchain_core.messages import BaseMessage
 from langchain_core.prompts import PromptTemplate
 
 from src.app.domain.schemas import AgentState
@@ -13,8 +14,18 @@ synthesize_prompt = (
 
 synthesize_prompt_template = PromptTemplate(
     template=synthesize_prompt,
-    input_variables=["user_query", "analysis_context"],
+    input_variables=["user_query", "analysis_context", "previous_context", "conversation_history"],
 )
+
+
+def _format_messages(messages: list[BaseMessage]) -> str:
+    if not messages:
+        return "None"
+    lines = []
+    for msg in messages:
+        role = "User" if msg.type == "human" else "Assistant"
+        lines.append(f"{role}: {msg.content}")
+    return "\n".join(lines)
 
 
 class SynthesizeNode:
@@ -25,20 +36,26 @@ class SynthesizeNode:
     def __build_context(self, state: AgentState) -> str:
         context = []
 
-        if state.task_classification.ticker:
-            desc = get_stock_descriptive(state.task_classification.ticker)
-            context += ["Stock descriptive:\n", desc]
+        if state["task_classification"].ticker:
+            desc = get_stock_descriptive(state["task_classification"].ticker)
+            context += ["Stock descriptive:\n", str(desc)]
 
-        for result in state.results:
-            context += [f"{result.source}\n{result.result}"]
+        for result in state.get("results", []):
+            context += [f"{result['source']}\n{result['result']}"]
 
         return "\n".join(context)
 
     def __call__(self, state: AgentState):
-        response = self.llm_chain.invoke(dict(
-            user_query=state.query,
-            analysis_context=self.__build_context(state),
-        ))
-        answer = response["messages"][-1].content
+        response = self.llm_chain.invoke({
+            "user_query": state["query"],
+            "analysis_context": self.__build_context(state),
+            "previous_context": state.get("previous_context", "") or "None",
+            "conversation_history": _format_messages(state.get("messages", [])),
+        })
+        answer = response.content
 
-        return dict(final_answer=answer)
+        prior = state.get("previous_context", "")
+        ticker = state["task_classification"].ticker or "unknown"
+        updated_context = (prior + f"\n\n--- Analysis: {ticker} ---\n" + answer).strip()
+
+        return {"final_answer": answer, "previous_context": updated_context}
