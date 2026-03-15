@@ -41,7 +41,7 @@ if __name__ == "__main__":
     "i currentrly own 200 shares with average price 18. should i sell stock and sell put, or sell short-term call?" \
     " . or wait near 20 and then sell call? or what should i do?"
 
-    query = "Analyze CF. It rallied for last few days. Is upside limited?"
+    query = "Analyze CF. Near IV is higher than IV in few month. Construct most profitable calendar spread for budget under 2k$ considering price will drop."
 
     for step in options_analysis_agent.stream(
         {"messages": [{"role": "user", "content": query}]}
