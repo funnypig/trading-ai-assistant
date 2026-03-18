@@ -1,6 +1,7 @@
 # trading-ai-assistant
-Trading AIssistant 
+Trading AIssistant
 
+![Agent Graph](docs/graph.png)
 
 ### Getting started
 

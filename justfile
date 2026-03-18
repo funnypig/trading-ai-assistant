@@ -6,3 +6,6 @@ query *args:
 
 run:
     PYTHONPATH=. uv run --env-file .env chainlit run src/app/ui/chainlit_app.py --port 8000
+
+visualize *args:
+    OPENAI_API_KEY=dummy PYTHONPATH=. uv run python -m src.app.cli.visualize {{args}}
