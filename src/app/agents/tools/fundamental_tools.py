@@ -5,9 +5,11 @@ from __future__ import annotations
 from langchain.tools import tool
 
 from src.app.data.finviz.get_fundamental import get_fundamental_info, get_stock_descriptive
+from src.app.infrastructure.cache.decorator import redis_cache
 
 
 @tool
+@redis_cache(ttl=86400, dumps=lambda x: x, loads=lambda x: x)
 def get_financial_statements(ticker: str) -> str:
     """Fetch quarterly income statement, balance sheet, and cash flow statement for a ticker.
 
@@ -21,6 +23,7 @@ def get_financial_statements(ticker: str) -> str:
 
 
 @tool
+@redis_cache(ttl=3600, dumps=lambda x: x, loads=lambda x: x)
 def get_stock_overview(ticker: str) -> str:
     """Fetch company description, snapshot financial metrics (P/E, market cap, margins, etc.),
     and top institutional ownership for a ticker.

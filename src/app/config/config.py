@@ -14,8 +14,10 @@ class Settings(BaseSettings):
     openai_api_key: str
     anthropic_api_key: str
     redis_url: str = "redis://localhost:6379/0"
+    supabase_db_url: str
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 settings = Settings()

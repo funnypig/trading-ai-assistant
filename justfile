@@ -1,3 +1,12 @@
+up:
+    docker network create trading-network || true
+    docker compose -f docker-compose.yml up -d
+    docker compose -f docker-compose.langfuse.yml up -d
+
+down:
+    docker compose -f docker-compose.yml down
+    docker compose -f docker-compose.langfuse.yml down
+
 test:
     uv run pytest tests/ -q
 

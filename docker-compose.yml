@@ -1,0 +1,50 @@
+networks:
+  trading-network:
+    external: true
+
+volumes:
+  openwebui-data:
+  redis-cache-data:
+
+services:
+  redis-cache:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"   # Redis Insight UI
+    command: redis-stack-server --requirepass ${REDIS_PASSWORD} --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-cache-data:/data
+    networks:
+      - trading-network
+    restart: unless-stopped
+
+  trading-pipeline:
+    build: .
+    ports:
+      - "9099:9099"
+    env_file: .env
+    environment:
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis-cache:6379/0
+      - LANGFUSE_BASE_URL=http://langfuse-web:3000
+    depends_on:
+      - redis-cache
+    networks:
+      - trading-network
+    restart: unless-stopped
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "8080:8080"
+    volumes:
+      - openwebui-data:/app/backend/data
+    environment:
+      - DATABASE_URL=${SUPABASE_DB_URL}
+      - OPENAI_API_BASE_URL=${PIPELINES_URL:-http://trading-pipeline:9099}/v1
+      - OPENAI_API_KEY=${PIPELINES_API_KEY:-0p3n-w3bu!}
+    depends_on:
+      - trading-pipeline
+    networks:
+      - trading-network
+    restart: unless-stopped
