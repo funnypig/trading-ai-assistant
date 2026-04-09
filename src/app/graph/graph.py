@@ -1,11 +1,10 @@
 from langchain.chat_models import init_chat_model
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.state import CompiledStateGraph
-from psycopg import AsyncConnection
 
-from src.app.config.config import MINI_MODEL, SMART_MODEL, settings
-from src.app.domain.schemas import AgentState
+from src.app.config.models import MINI_MODEL, SMART_MODEL
+from src.app.graph.state import AgentState
+from src.app.infrastructure.persistence.checkpointer import create_postgres_checkpointer
 from src.app.agents.nodes import (
     TaskClassificationNode,
     FundamentalAnalysisNode,
@@ -62,7 +61,5 @@ def build_graph(checkpointer=None) -> CompiledStateGraph:
 
 
 async def create_graph() -> CompiledStateGraph:
-    conn = await AsyncConnection.connect(settings.supabase_db_url, autocommit=True)
-    checkpointer = AsyncPostgresSaver(conn)
-    await checkpointer.setup()
+    checkpointer = await create_postgres_checkpointer()
     return build_graph(checkpointer=checkpointer)

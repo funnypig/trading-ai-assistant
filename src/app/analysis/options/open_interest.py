@@ -5,7 +5,7 @@ from typing import List, Optional
 
 import pandas as pd
 
-from src.app.tools.options.common import FinvizOptionChainKeys as FK
+from src.app.analysis.options.common import FinvizOptionChainKeys as FK
 
 
 @dataclass

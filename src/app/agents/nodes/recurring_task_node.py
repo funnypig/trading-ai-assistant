@@ -1,4 +1,4 @@
-from src.app.domain.schemas import AgentState
+from src.app.graph.state import AgentState
 
 
 class RecurringTaskNode:

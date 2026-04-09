@@ -1,4 +1,4 @@
-from src.app.domain.schemas import AgentState, AgentOutput
+from src.app.graph.state import AgentState, AgentOutput
 from src.app.agents.fundamental_agent import fundamental_analysis_agent
 
 

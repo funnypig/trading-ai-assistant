@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from langchain.tools import tool
 
-from src.app.data.finviz.get_fundamental import get_fundamental_info, get_stock_descriptive
 from src.app.infrastructure.cache.decorator import redis_cache
+from src.app.services.fundamental_service import fetch_financial_statements, fetch_stock_overview
 
 
 @tool
@@ -19,7 +19,7 @@ def get_financial_statements(ticker: str) -> str:
     Returns:
         A formatted string containing all three financial statements as CSV tables.
     """
-    return get_fundamental_info(ticker)
+    return fetch_financial_statements(ticker)
 
 
 @tool
@@ -34,8 +34,7 @@ def get_stock_overview(ticker: str) -> str:
     Returns:
         A markdown-formatted string with company overview, financials, and ownership data.
     """
-    info = get_stock_descriptive(ticker)
-    return info.to_markdown()
+    return fetch_stock_overview(ticker)
 
 
 if __name__ == "__main__":

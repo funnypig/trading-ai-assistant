@@ -2,7 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from src.app.domain.schemas import AgentOutput, TaskClassificationResult
+from src.app.domain.schemas import TaskClassificationResult
+from src.app.graph.state import AgentOutput
 from src.app.graph.graph import build_graph
 
 # ---------------------------------------------------------------------------

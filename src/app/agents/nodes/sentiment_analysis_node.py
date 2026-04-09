@@ -1,6 +1,6 @@
-from src.app.domain.schemas import AgentState, AgentOutput
+from src.app.graph.state import AgentState, AgentOutput
 from src.app.agents.sentiment_agent import sentiment_analysis_agent
-from src.app.tools.news.registry import init as init_registry
+from src.app.analysis.news.registry import init as init_registry
 
 
 class SentimentAnalysisNode:

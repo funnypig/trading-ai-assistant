@@ -3,7 +3,7 @@ from langchain.chat_models import init_chat_model
 from importlib.resources import files
 
 from src.app.agents.tools.sentiment_tools import get_stock_news_feed, get_market_news_feed, fetch_article_content
-from src.app.tools.news.registry import init as init_registry
+from src.app.analysis.news.registry import init as init_registry
 from src.app.config.config import MINI_MODEL
 
 model = init_chat_model(MINI_MODEL)

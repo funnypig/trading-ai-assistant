@@ -1,23 +1,5 @@
-from pydantic_settings import BaseSettings
+# Backward-compatibility shim — import from the canonical modules instead.
+from src.app.config.settings import Settings, settings
+from src.app.config.models import SMART_MODEL, DATA_ANALYSIS_MODEL, MINI_MODEL
 
-
-SMART_MODEL = "openai:gpt-5.4"
-DATA_ANALYSIS_MODEL = "claude-sonnet-4-6"
-MINI_MODEL = "openai:gpt-5-mini"
-
-
-class Settings(BaseSettings):
-    finviz_api_key: str
-    finviz_email: str
-    finviz_password: str
-    playwright_user_data_dir: str
-    openai_api_key: str
-    anthropic_api_key: str
-    redis_url: str = "redis://localhost:6379/0"
-    supabase_db_url: str
-
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
-
-settings = Settings()
+__all__ = ["Settings", "settings", "SMART_MODEL", "DATA_ANALYSIS_MODEL", "MINI_MODEL"]

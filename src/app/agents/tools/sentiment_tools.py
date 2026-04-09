@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from langchain.tools import tool
 
-from src.app.data.finviz.get_news import get_stock_news, get_market_news
-from src.app.tools.news.extractor import extract_article
-from src.app.tools.news.registry import register, resolve
+from src.app.services.news_service import (
+    format_stock_news_feed,
+    format_market_news_feed,
+    fetch_article_by_id,
+)
 
 
 @tool
@@ -23,10 +25,7 @@ def fetch_article_content(article_id: int) -> str:
         Extracted article text, or a short message explaining why extraction failed
         (unknown ID, paywall, bot protection, etc.).
     """
-    url = resolve(article_id)
-    if url is None:
-        return f"[No article found with ID {article_id}. Call a news feed tool first.]"
-    return extract_article(url)
+    return fetch_article_by_id(article_id)
 
 
 @tool
@@ -42,11 +41,7 @@ def get_stock_news_feed(ticker: str) -> str:
     Returns:
         A formatted string with numbered, dated news headlines for the given stock.
     """
-    news = get_stock_news(ticker)
-    if not news:
-        return f"No news found for {ticker}."
-    lines = [f"[{register(item.url)}] {item.date} | {item.title}" for item in news]
-    return f"Recent news for {ticker}:\n" + "\n".join(lines)
+    return format_stock_news_feed(ticker)
 
 
 @tool
@@ -59,11 +54,7 @@ def get_market_news_feed() -> str:
     Returns:
         A formatted string with numbered, dated market-wide news headlines.
     """
-    news = get_market_news()
-    if not news:
-        return "No market news available."
-    lines = [f"[{register(item.url)}] {item.date} | {item.title}" for item in news]
-    return "Recent market news:\n" + "\n".join(lines)
+    return format_market_news_feed()
 
 
 if __name__ == "__main__":

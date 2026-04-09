@@ -1,10 +1,8 @@
-import asyncio
-
 import chainlit as cl
 from langchain_core.messages import HumanMessage, AIMessage
-from langfuse.langchain import CallbackHandler
 
 from src.app.graph.graph import create_graph
+from src.app.observability.langfuse import get_langfuse_handler, flush_handler
 
 _graph = None
 
@@ -29,7 +27,7 @@ async def on_chat_start():
 @cl.on_message
 async def on_message(message: cl.Message):
     thread_id = cl.user_session.get("thread_id")
-    langfuse_handler = CallbackHandler()
+    langfuse_handler = get_langfuse_handler()
     config = {
         "configurable": {"thread_id": thread_id},
         "callbacks": [langfuse_handler],
@@ -87,5 +85,4 @@ async def on_message(message: cl.Message):
             {"messages": [AIMessage(content=final_text)]},
         )
 
-    # flush blocks until all queued trace events are sent; run_in_executor avoids blocking the event loop
-    await asyncio.get_event_loop().run_in_executor(None, langfuse_handler.flush)
+    await flush_handler(langfuse_handler)

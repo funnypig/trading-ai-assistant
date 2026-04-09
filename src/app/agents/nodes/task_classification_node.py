@@ -4,7 +4,8 @@ from langchain_core.messages import BaseMessage
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 
-from src.app.domain.schemas import AgentState, TaskClassificationResult
+from src.app.domain.schemas import TaskClassificationResult
+from src.app.graph.state import AgentState
 
 task_classification_parser = PydanticOutputParser(pydantic_object=TaskClassificationResult)
 

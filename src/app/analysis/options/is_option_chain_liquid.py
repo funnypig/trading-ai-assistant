@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from src.app.tools.options.common import FinvizOptionChainKeys as FK, OptionLiquidityScore, OptionLiquidityResult
+from src.app.analysis.options.common import FinvizOptionChainKeys as FK, OptionLiquidityScore, OptionLiquidityResult
 
 
 def is_option_chain_liquid(chain: pd.DataFrame) -> OptionLiquidityResult:

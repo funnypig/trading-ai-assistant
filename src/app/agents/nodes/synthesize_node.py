@@ -2,8 +2,8 @@ from importlib.resources import files
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import PromptTemplate
 
-from src.app.domain.schemas import AgentState
-from src.app.data.finviz.get_fundamental import get_stock_descriptive
+from src.app.graph.state import AgentState
+from src.app.services.fundamental_service import fetch_stock_descriptive
 
 
 synthesize_prompt = (
@@ -37,7 +37,7 @@ class SynthesizeNode:
         context = []
 
         if state["task_classification"].ticker:
-            desc = get_stock_descriptive(state["task_classification"].ticker)
+            desc = fetch_stock_descriptive(state["task_classification"].ticker)
             context += ["Stock descriptive:\n", str(desc)]
 
         for result in state.get("results", []):
